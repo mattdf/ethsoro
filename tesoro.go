@@ -259,6 +259,22 @@ func (c *Client) SignMessage(message []byte) []byte {
 	return msg
 }
 
+func (c *Client) EthereumSignMessage(addressN []uint32, message []byte) []byte {
+	var m messages.EthereumSignMessage
+	m.Message = norm.NFC.Bytes(message)
+	m.AddressN = addressN
+	marshalled, err := proto.Marshal(&m)
+
+	if err != nil {
+		fmt.Println("ERROR Marshalling")
+	}
+
+	magicHeader := append([]byte{35, 35}, c.Header(messages.MessageType_MessageType_EthereumSignMessage, marshalled)...)
+	msg := append(magicHeader, marshalled...)
+
+	return msg
+}
+
 func (c *Client) SignIdentity(uri string, challengeHidden []byte, challengeVisual string, index uint32) []byte {
 	var m messages.SignIdentity
 	identity := URIToIdentity(uri)
@@ -821,6 +837,17 @@ func (c *Client) Read() (string, uint16) {
 	case messages.MessageType_MessageType_EntropyRequest:
 		externalEntropy, _ := GenerateRandomBytes(32)
 		str, msgType = c.Call(c.EntropyAck(externalEntropy))
+		break
+	case messages.MessageType_MessageType_EthereumMessageSignature:
+		var msg messages.EthereumMessageSignature
+		err = proto.Unmarshal(marshalled, &msg)
+		if err != nil {
+			str = "Error unmarshalling (66)"
+		} else {
+			str = strings.Join([]string{"Address:", hex.EncodeToString(msg.GetAddress()), "Signature:", hex.EncodeToString(msg.GetSignature())}, " ")
+			//			smJSON, _ := json.Marshal(&msg)
+			//			str = string(smJSON)
+		}
 		break
 	case messages.MessageType_MessageType_MessageSignature:
 		var msg messages.MessageSignature

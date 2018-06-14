@@ -141,6 +141,16 @@ func shell() {
 				str, msgType = call(client.SignMessage([]byte(msg)))
 			}
 			break
+		case "ethsignmessage":
+			var path string
+			if len(args) < 3 {
+				fmt.Println("Missing parameters")
+			} else {
+				path = args[1]
+				msg := strings.Join(args[2:], " ")
+				str, msgType = call(client.EthereumSignMessage(tesoro.StringToBIP32Path(path), []byte(msg)))
+			}
+			break
 		case "verifymessage":
 			if len(args) < 4 {
 				fmt.Println("Missing parameters")
@@ -172,7 +182,7 @@ func shell() {
 			var path string
 			showDisplay := false
 			if len(args) < 2 {
-				path = "m/44'/0'/0'"
+				path = "m/44'/60'/0'/0/0"
 			} else {
 				path = args[1]
 			}
