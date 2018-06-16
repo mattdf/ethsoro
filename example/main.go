@@ -15,6 +15,8 @@ import (
 
 	"encoding/base64"
 
+	"math/big"
+
 	"github.com/chzyer/readline"
 	"github.com/conejoninja/tesoro"
 	"github.com/conejoninja/tesoro/pb/messages"
@@ -149,6 +151,49 @@ func shell() {
 				path = args[1]
 				msg := strings.Join(args[2:], " ")
 				str, msgType = call(client.EthereumSignMessage(tesoro.StringToBIP32Path(path), []byte(msg)))
+			}
+			break
+		case "ethsigntx":
+			var path, to string
+			var chainid uint32
+			var nonce, gasprice, gaslimit, value big.Int
+			var data []byte
+			chainid = 0
+			if len(args) < 7 {
+				fmt.Println("Missing parameters")
+			} else {
+				path = args[1]
+				nonce.SetString(args[2], 10)
+				gasprice.SetString(args[3], 10)
+				gaslimit.SetString(args[4], 10)
+				if args[5] != "X" {
+					to = args[5]
+				}
+				value.SetString(args[6], 10)
+				if len(args) > 7 && args[7] != "X" {
+					if len(args[7])%2 != 0 {
+						fmt.Println("data segment must be divisible by 2")
+						break
+					}
+					data = []byte(args[7])
+					dataB := make([]byte, len(data)/2, len(data)/2)
+					hex.Decode(dataB, []byte(data))
+					data = dataB
+
+				}
+				if len(args) > 8 {
+					c, _ := strconv.Atoi(args[8])
+					chainid = uint32(c)
+				}
+				str, msgType = call(client.EthereumSignTx(
+					tesoro.StringToBIP32Path(path),
+					nonce,
+					gasprice,
+					gaslimit,
+					to,
+					value,
+					data,
+					chainid))
 			}
 			break
 		case "verifymessage":

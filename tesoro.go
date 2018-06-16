@@ -17,6 +17,7 @@ import (
 	"io"
 	"log"
 	"math"
+	"math/big"
 	"net/url"
 	"os"
 	"reflect"
@@ -270,6 +271,41 @@ func (c *Client) EthereumSignMessage(addressN []uint32, message []byte) []byte {
 	}
 
 	magicHeader := append([]byte{35, 35}, c.Header(messages.MessageType_MessageType_EthereumSignMessage, marshalled)...)
+	msg := append(magicHeader, marshalled...)
+
+	return msg
+}
+
+func (c *Client) EthereumSignTx(addressN []uint32, nonce big.Int, gasprice big.Int, gaslimit big.Int, to string, value big.Int, data []byte, chainid uint32) []byte {
+	var m messages.EthereumSignTx
+	var dl uint32
+	var toByte []byte
+	toByte = make([]byte, 20, 20)
+	hex.Decode(toByte, []byte(to))
+	dl = uint32(len(data))
+
+	m.AddressN = addressN
+	m.Nonce = nonce.Bytes()
+	m.GasPrice = gasprice.Bytes()
+	m.GasLimit = gaslimit.Bytes()
+	if len(to) > 0 {
+		m.To = toByte
+	}
+	m.Value = value.Bytes()
+	if dl > 0 {
+		m.DataInitialChunk = data
+		m.DataLength = &dl
+	}
+	if chainid > 0 {
+		m.ChainId = &chainid
+	}
+	marshalled, err := proto.Marshal(&m)
+
+	if err != nil {
+		fmt.Println("ERROR Marshalling")
+	}
+
+	magicHeader := append([]byte{35, 35}, c.Header(messages.MessageType_MessageType_EthereumSignTx, marshalled)...)
 	msg := append(magicHeader, marshalled...)
 
 	return msg
@@ -847,6 +883,27 @@ func (c *Client) Read() (string, uint16) {
 			str = strings.Join([]string{"Address:", hex.EncodeToString(msg.GetAddress()), "Signature:", hex.EncodeToString(msg.GetSignature())}, " ")
 			//			smJSON, _ := json.Marshal(&msg)
 			//			str = string(smJSON)
+		}
+		break
+	case messages.MessageType_MessageType_EthereumTxRequest:
+		var msg messages.EthereumTxRequest
+
+		err = proto.Unmarshal(marshalled, &msg)
+		if err != nil {
+			str = "Error unmarshalling (59)"
+		} else {
+			str = strings.Join([]string{"V:", fmt.Sprint(msg.GetSignatureV()), "R:", hex.EncodeToString(msg.GetSignatureR()), "S:", hex.EncodeToString(msg.GetSignatureS())}, " ")
+		}
+		break
+	case messages.MessageType_MessageType_EthereumTxAck:
+		var msg messages.EthereumTxAck
+
+		err = proto.Unmarshal(marshalled, &msg)
+		if err != nil {
+			str = "Error unmarshalling (60)"
+		} else {
+			smJSON, _ := json.Marshal(&msg)
+			str = string(smJSON)
 		}
 		break
 	case messages.MessageType_MessageType_MessageSignature:
