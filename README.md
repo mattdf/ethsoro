@@ -1,5 +1,8 @@
 TESORO
 ======
+
+NOTE: This repo is a fork of tesoro that adds eth specific funcionality, and I'm using it as a foundation for some tools I'm building. work in progress.
+
 Go package to work with [TREZOR devices](http://bitcointrezor.com/). This repository is an unofficial package written in Go (golang), for any official package, code or tool, please go to the official [TREZOR repository](https://github.com/trezor)
 
 ## What is TREZOR?
@@ -38,6 +41,7 @@ If you find any improvement or issue you want to fix, feel free to send me a pul
 This is distributed under the Apache License v2.0
 
 Copyright 2016 Daniel Esteban  -  conejo@conejo.me
+Copyright 2018 Matthew Di Ferrante  -  matthew@zklabs.io
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
