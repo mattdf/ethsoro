@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"encoding/json"
-	"github.com/conejoninja/tesoro"
-	"github.com/conejoninja/tesoro/pb/messages"
-	"github.com/conejoninja/tesoro/tests/common"
-	"github.com/conejoninja/tesoro/transport"
+	"github.com/mattdf/ethsoro"
+	"github.com/mattdf/ethsoro/pb/messages"
+	"github.com/mattdf/ethsoro/tests/common"
+	"github.com/mattdf/ethsoro/transport"
 	"github.com/zserge/hid"
 )
 

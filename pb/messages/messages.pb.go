@@ -97,7 +97,7 @@ package messages
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import types "github.com/conejoninja/tesoro/pb/types"
+import types "github.com/mattdf/ethsoro/pb/types"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal

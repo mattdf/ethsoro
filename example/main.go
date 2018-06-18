@@ -18,9 +18,9 @@ import (
 	"math/big"
 
 	"github.com/chzyer/readline"
-	"github.com/conejoninja/tesoro"
-	"github.com/conejoninja/tesoro/pb/messages"
-	"github.com/conejoninja/tesoro/transport"
+	"github.com/mattdf/ethsoro"
+	"github.com/mattdf/ethsoro/pb/messages"
+	"github.com/mattdf/ethsoro/transport"
 	"github.com/zserge/hid"
 )
 

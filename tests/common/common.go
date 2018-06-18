@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"os"
 
-	"github.com/conejoninja/tesoro"
+	"github.com/mattdf/ethsoro"
 )
 
 const Mnemonic12 = "alcohol woman abuse must during monitor noble actual mixed trade anger aisle"

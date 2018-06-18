@@ -25,9 +25,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/conejoninja/tesoro/pb/messages"
-	"github.com/conejoninja/tesoro/pb/types"
-	"github.com/conejoninja/tesoro/transport"
+	"github.com/mattdf/ethsoro/pb/messages"
+	"github.com/mattdf/ethsoro/pb/types"
+	"github.com/mattdf/ethsoro/transport"
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/text/unicode/norm"
 )
