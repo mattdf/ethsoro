@@ -25,10 +25,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/mattdf/ethsoro/pb/messages"
 	"github.com/mattdf/ethsoro/pb/types"
 	"github.com/mattdf/ethsoro/transport"
-	"github.com/golang/protobuf/proto"
 	"golang.org/x/text/unicode/norm"
 )
 
@@ -276,13 +276,28 @@ func (c *Client) EthereumSignMessage(addressN []uint32, message []byte) []byte {
 	return msg
 }
 
-func (c *Client) EthereumSignTx(addressN []uint32, nonce big.Int, gasprice big.Int, gaslimit big.Int, to string, value big.Int, data []byte, chainid uint32) []byte {
+func (c *Client) EthereumTxAck(data []byte) []byte {
+	var m messages.EthereumTxAck
+	m.DataChunk = data
+	marshalled, err := proto.Marshal(&m)
+
+	if err != nil {
+		fmt.Println("ERROR Marshalling")
+	}
+
+	magicHeader := append([]byte{35, 35}, c.Header(messages.MessageType_MessageType_EthereumTxAck, marshalled)...)
+	msg := append(magicHeader, marshalled...)
+
+	return msg
+}
+
+func (c *Client) EthereumSignTx(addressN []uint32, nonce big.Int, gasprice big.Int, gaslimit big.Int, to string, value big.Int, data []byte, datalength uint32, chainid uint32) []byte {
 	var m messages.EthereumSignTx
 	var dl uint32
 	var toByte []byte
 	toByte = make([]byte, 20, 20)
 	hex.Decode(toByte, []byte(to))
-	dl = uint32(len(data))
+	dl = datalength
 
 	m.AddressN = addressN
 	m.Nonce = nonce.Bytes()
@@ -880,9 +895,8 @@ func (c *Client) Read() (string, uint16) {
 		if err != nil {
 			str = "Error unmarshalling (66)"
 		} else {
-			str = strings.Join([]string{"Address:", hex.EncodeToString(msg.GetAddress()), "Signature:", hex.EncodeToString(msg.GetSignature())}, " ")
-			//			smJSON, _ := json.Marshal(&msg)
-			//			str = string(smJSON)
+			smJSON, _ := json.Marshal(&msg)
+			str = string(smJSON)
 		}
 		break
 	case messages.MessageType_MessageType_EthereumTxRequest:
@@ -892,7 +906,8 @@ func (c *Client) Read() (string, uint16) {
 		if err != nil {
 			str = "Error unmarshalling (59)"
 		} else {
-			str = strings.Join([]string{"V:", fmt.Sprint(msg.GetSignatureV()), "R:", hex.EncodeToString(msg.GetSignatureR()), "S:", hex.EncodeToString(msg.GetSignatureS())}, " ")
+			smJSON, _ := json.Marshal(&msg)
+			str = string(smJSON)
 		}
 		break
 	case messages.MessageType_MessageType_EthereumTxAck:
